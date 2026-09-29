@@ -1,0 +1,21 @@
+{
+  "name": "falkenau-campus-backend",
+  "version": "1.0.0",
+  "description": "Backend & SQLite-Datenbank für das Falkenau Campus Studierendenportal",
+  "main": "server.js",
+  "scripts": {
+    "seed": "node seed.js",
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}

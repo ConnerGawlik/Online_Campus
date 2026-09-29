@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap">
+  <style>
+    body{margin:0}
+    ::selection{background:oklch(58% 0.19 290 / 0.25)}
+    a{color:oklch(58% 0.19 290);text-underline-offset:3px}
+    input[type=file]{display:none}
+  </style>
+</helmet>
+
+<div style="min-height:100vh;background:oklch(97% 0.005 260);color:oklch(20% 0.02 265);font-family:'Inter',system-ui,sans-serif;font-size:15px;line-height:1.55">
+
+<sc-if value="{{ isLogin }}" hint-placeholder-val="{{ true }}">
+<div data-screen-label="Login" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(circle at 20% 20%, oklch(66% 0.16 250) 0%, oklch(32% 0.12 290) 45%, oklch(20% 0.08 290) 100%)">
+  <div style="width:100%;max-width:420px;background:#ffffff;border-radius:24px;box-shadow:0 24px 60px oklch(20% 0.05 290 / 0.35);padding:40px 36px">
+    <div style="display:inline-flex;align-items:center;gap:8px;margin-bottom:24px">
+      <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg, oklch(58% 0.19 290), oklch(72% 0.13 175))"></div>
+      <div style="font-family:'Space Grotesk';font-weight:700;font-size:16px">Falkenau Campus</div>
+    </div>
+    <h1 style="font-family:'Space Grotesk';font-weight:700;font-size:26px;margin:0 0 6px;letter-spacing:-0.01em">Willkommen zurück</h1>
+    <p style="margin:0 0 24px;font-size:13px;color:oklch(52% 0.02 265)">Demo-Zugang &mdash; wähle einen Musterstudierenden</p>
+    <form onSubmit="{{ login }}">
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px">
+        <sc-for list="{{ personasForLogin }}" as="p" hint-placeholder-count="3">
+          <label style="{{ p.optionStyle }}">
+            <input type="radio" name="persona" checked="{{ p.selected }}" onChange="{{ selectPersona }}" value="{{ p.id }}" style="position:absolute;opacity:0;width:0;height:0">
+            <span style="{{ p.dotStyle }}"></span>
+            <span style="display:flex;flex-direction:column;gap:1px">
+              <span style="font-size:14px;font-weight:600;font-family:'Space Grotesk'">{{ p.name }}</span>
+              <span style="font-size:12px;color:oklch(52% 0.02 265)">{{ p.studiengang }}</span>
+            </span>
+          </label>
+        </sc-for>
+      </div>
+      <label style="display:block;font-size:12px;font-weight:500;margin-bottom:6px;color:oklch(45% 0.02 265)">Passwort</label>
+      <input type="password" placeholder="beliebiges Passwort" value="{{ password }}" onChange="{{ setPassword }}" style="width:100%;min-height:44px;padding:10px 14px;font-size:14px;font-family:'Inter';color:oklch(20% 0.02 265);background:oklch(97% 0.005 260);border:1.5px solid oklch(90% 0.01 265);border-radius:12px;box-sizing:border-box;outline:none">
+      <button type="submit" style="display:flex;width:100%;align-items:center;justify-content:center;margin-top:20px;cursor:pointer;border:none;font-family:'Space Grotesk';font-weight:600;font-size:15px;color:#fff;background:linear-gradient(135deg, oklch(58% 0.19 290), oklch(52% 0.18 300));padding:13px 16px;border-radius:12px;box-shadow:0 8px 20px oklch(58% 0.19 290 / 0.35)">Anmelden</button>
+      <p style="margin:16px 0 0;font-size:12px;color:oklch(60% 0.02 265);text-align:center">Demo-Modus: jedes Passwort funktioniert.</p>
+    </form>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isApp }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-wrap:wrap;min-height:100vh">
+  <aside style="flex:0 1 240px;min-width:220px;background:linear-gradient(200deg, oklch(24% 0.09 290), oklch(34% 0.13 290));color:#fff;display:flex;flex-direction:column;padding:24px 18px;gap:28px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg, oklch(72% 0.16 290), oklch(76% 0.13 175))"></div>
+      <div style="font-family:'Space Grotesk';font-weight:700;font-size:16px">Falkenau Campus</div>
+    </div>
+    <nav style="display:flex;flex-direction:column;gap:4px">
+      <a onClick="{{ goDashboard }}" style="{{ navStyles.dashboard }}"><span style="{{ navDotStyle }}"></span>Dashboard</a>
+      <a onClick="{{ goStundenplan }}" style="{{ navStyles.stundenplan }}"><span style="{{ navDotStyle }}"></span>Stundenplan</a>
+      <a onClick="{{ goNoten }}" style="{{ navStyles.noten }}"><span style="{{ navDotStyle }}"></span>Noten</a>
+      <a onClick="{{ goAbgaben }}" style="{{ navStyles.abgaben }}"><span style="{{ navDotStyle }}"></span>Abgaben</a>
+      <a onClick="{{ goNachrichten }}" style="{{ navStyles.nachrichten }}"><span style="{{ navDotStyle }}"></span>Nachrichten
+        <sc-if value="{{ hasUnread }}" hint-placeholder-val="{{ false }}">
+          <span style="margin-left:auto;background:oklch(72% 0.13 175);color:oklch(20% 0.05 175);font-size:11px;font-weight:700;padding:2px 7px;border-radius:20px">{{ unreadCount }}</span>
+        </sc-if>
+      </a>
+    </nav>
+    <div style="margin-top:auto;display:flex;align-items:center;gap:10px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.15)">
+      <div style="width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:'Space Grotesk'">{{ initials }}</div>
+      <div style="display:flex;flex-direction:column;gap:0px;min-width:0">
+        <span style="font-size:13px;font-weight:600;font-family:'Space Grotesk';white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ persona.name }}</span>
+        <a onClick="{{ logout }}" style="cursor:pointer;font-size:12px;color:rgba(255,255,255,0.7);text-decoration:none">Abmelden</a>
+      </div>
+    </div>
+  </aside>
+
+  <div style="flex:1 1 480px;min-width:0;display:flex;flex-direction:column">
+    <div style="padding:20px 32px;border-bottom:1px solid oklch(90% 0.01 265);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+      <div>
+        <div style="font-family:'Space Grotesk';font-weight:700;font-size:18px">{{ pageTitle }}</div>
+        <div style="font-size:12px;color:oklch(52% 0.02 265)">Montag, 14. September 2026 &middot; {{ persona.studiengang }}</div>
+      </div>
+    </div>
+
+    <div style="padding:28px 32px 64px;max-width:1100px">
+
+    <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ true }}">
+    <div data-screen-label="Dashboard">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:28px">
+        <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 4px 16px oklch(30% 0.05 290 / 0.06)">
+          <div style="font-size:12px;color:oklch(52% 0.02 265);margin-bottom:6px">Offene Abgaben</div>
+          <div style="font-family:'Space Grotesk';font-weight:700;font-size:28px">{{ openCount }}</div>
+        </div>
+        <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 4px 16px oklch(30% 0.05 290 / 0.06)">
+          <div style="font-size:12px;color:oklch(52% 0.02 265);margin-bottom:6px">Nächste Klausur</div>
+          <div style="font-family:'Space Grotesk';font-weight:700;font-size:20px">{{ nextExamDate }}</div>
+        </div>
+        <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 4px 16px oklch(30% 0.05 290 / 0.06)">
+          <div style="font-size:12px;color:oklch(52% 0.02 265);margin-bottom:6px">Notenschnitt</div>
+          <div style="font-family:'Space Grotesk';font-weight:700;font-size:28px">{{ avgGrade }}</div>
+        </div>
+        <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 4px 16px oklch(30% 0.05 290 / 0.06)">
+          <div style="font-size:12px;color:oklch(52% 0.02 265);margin-bottom:6px">Ungelesen</div>
+          <div style="font-family:'Space Grotesk';font-weight:700;font-size:28px">{{ unreadCount }}</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px">
+        <div style="background:#fff;border-radius:16px;padding:20px;box-shadow:0 4px 16px oklch(30% 0.05 290 / 0.06)">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px">
+            <div style="font-family:'Space Grotesk';font-weight:700;font-size:16px">Nächste Abgaben</div>
+            <a onClick="{{ goAbgaben }}" style="font-size:12px;font-weight:600;cursor:pointer;text-decoration:none">Verwalten &rarr;</a>
+          </div>
+          <sc-for list="{{ persona.abgaben }}" as="a" hint-placeholder-count="3">
+            <div style="display:flex;flex-direction:column;gap:4px;padding:10px 0;border-top:1px solid oklch(93% 0.01 265)">
+              <div style="font-size:14px;font-weight:600">{{ a.title }}</div>
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+                <span style="font-size:12px;color:oklch(52% 0.02 265)">{{ a.modul }}</span>
+                <span style="font-size:11px;font-weight:600;background:oklch(96% 0.03 70);color:oklch(45% 0.13 55);padding:3px 10px;border-radius:20px">{{ a.due }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="background:#fff;border-radius:16px;padding:20px;box-shadow:0 4px 16px oklch(30% 0.05 290 / 0.06)">
+          <div style="font-family:'Space Grotesk';font-weight:700;font-size:16px;margin-bottom:12px">Nächste Klausuren</div>
+          <sc-for list="{{ persona.klausuren }}" as="k" hint-placeholder-count="2">
+            <div style="display:flex;flex-direction:column;gap:4px;padding:10px 0;border-top:1px solid oklch(93% 0.01 265)">
+              <div style="font-size:14px;font-weight:600">{{ k.modul }}</div>
+              <div style="font-size:12px;color:oklch(52% 0.02 265)">{{ k.date }} &middot; {{ k.time }} Uhr &middot; Raum {{ k.room }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="background:#fff;border-radius:16px;padding:20px;box-shadow:0 4px 16px oklch(30% 0.05 290 / 0.06)">
+          <div style="font-family:'Space Grotesk';font-weight:700;font-size:16px;margin-bottom:12px">Vorlesungen heute</div>
+          <sc-for list="{{ persona.heute }}" as="v" hint-placeholder-count="3">
+            <div style="display:flex;flex-direction:column;gap:4px;padding:10px 0;border-top:1px solid oklch(93% 0.01 265)">
+              <div style="font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;color:oklch(58% 0.19 290)">{{ v.time }}</div>
+              <div style="font-size:14px">{{ v.course }}</div>
+              <div style="font-size:12px;color:oklch(52% 0.02 265)">Raum {{ v.room }} &middot; {{ v.dozent }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="background:#fff;border-radius:16px;padding:20px;box-shadow:0 4px 16px oklch(30% 0.05 290 / 0.06)">
+          <div style="font-family:'Space Grotesk';font-weight:700;font-size:16px;margin-bottom:12px">Neuigkeiten</div>
+          <sc-for list="{{ news }}" as="n" hint-placeholder-count="3">
+            <div style="display:flex;flex-direction:column;gap:4px;padding:10px 0;border-top:1px solid oklch(93% 0.01 265)">
+              <div style="font-size:11px;letter-spacing:0.04em;text-transform:uppercase;color:oklch(58% 0.19 290);font-weight:600">{{ n.source }}</div>
+              <div style="font-size:14px">{{ n.text }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="background:#fff;border-radius:16px;padding:20px;box-shadow:0 4px 16px oklch(30% 0.05 290 / 0.06)">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px">
+            <div style="font-family:'Space Grotesk';font-weight:700;font-size:16px">Postfach</div>
+            <a onClick="{{ goNachrichten }}" style="font-size:12px;font-weight:600;cursor:pointer;text-decoration:none">Alle ansehen &rarr;</a>
+          </div>
+          <sc-for list="{{ inboxPreview }}" as="m" hint-placeholder-count="3">
+            <div style="padding:10px 0;border-top:1px solid oklch(93% 0.01 265)">
+              <div style="display:flex;justify-content:space-between;gap:8px">
+                <span style="font-size:13px;font-weight:{{ m.weight }}">{{ m.from }}</span>
+                <span style="font-size:11px;color:oklch(60% 0.02 265)">{{ m.date }}</span>
+              </div>
+              <div style="font-size:13px;font-weight:{{ m.weight }}">{{ m.subject }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isStundenplan }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Stundenplan" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px">
+      <sc-for list="{{ persona.stundenplan }}" as="d" hint-placeholder-count="5">
+        <div style="background:#fff;border-radius:16px;padding:16px;box-shadow:0 4px 16px oklch(30% 0.05 290 / 0.06)">
+          <div style="font-size:12px;font-weight:700;font-family:'Space Grotesk';color:oklch(58% 0.19 290);margin-bottom:10px">{{ d.day }}</div>
+          <sc-for list="{{ d.items }}" as="i" hint-placeholder-count="2">
+            <div style="padding:8px 0;border-top:1px solid oklch(93% 0.01 265)">
+              <div style="font-size:12px;font-weight:600;font-variant-numeric:tabular-nums">{{ i.time }}</div>
+              <div style="font-size:13px">{{ i.course }}</div>
+              <div style="font-size:11px;color:oklch(52% 0.02 265)">Raum {{ i.room }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isNoten }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Notenübersicht" style="background:#fff;border-radius:16px;padding:8px 20px;box-shadow:0 4px 16px oklch(30% 0.05 290 / 0.06)">
+      <table style="width:100%;border-collapse:collapse;font-size:14px">
+        <thead>
+          <tr>
+            <th style="text-align:left;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(52% 0.02 265);padding:14px 8px;border-bottom:1px solid oklch(93% 0.01 265)">Modul</th>
+            <th style="text-align:left;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(52% 0.02 265);padding:14px 8px;border-bottom:1px solid oklch(93% 0.01 265)">Note</th>
+            <th style="text-align:left;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(52% 0.02 265);padding:14px 8px;border-bottom:1px solid oklch(93% 0.01 265)">ECTS</th>
+            <th style="text-align:left;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(52% 0.02 265);padding:14px 8px;border-bottom:1px solid oklch(93% 0.01 265)">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <sc-for list="{{ noten }}" as="g" hint-placeholder-count="5">
+            <tr>
+              <td style="padding:12px 8px;border-bottom:1px solid oklch(93% 0.01 265)">{{ g.modul }}</td>
+              <td style="padding:12px 8px;border-bottom:1px solid oklch(93% 0.01 265);font-weight:600">{{ g.noteLabel }}</td>
+              <td style="padding:12px 8px;border-bottom:1px solid oklch(93% 0.01 265)">{{ g.ects }}</td>
+              <td style="padding:12px 8px;border-bottom:1px solid oklch(93% 0.01 265)"><span style="{{ g.tagStyle }}">{{ g.statusLabel }}</span></td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isAbgaben }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Abgaben" style="display:flex;flex-direction:column;gap:14px">
+      <sc-for list="{{ abgabenList }}" as="a" hint-placeholder-count="3">
+        <div style="background:#fff;border-radius:16px;padding:20px;box-shadow:0 4px 16px oklch(30% 0.05 290 / 0.06);display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between">
+          <div style="min-width:220px">
+            <div style="font-size:15px;font-weight:600;margin-bottom:4px">{{ a.title }}</div>
+            <div style="font-size:12px;color:oklch(52% 0.02 265)">{{ a.modul }} &middot; Fällig am {{ a.due }}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="{{ a.tagStyle }}">{{ a.tagLabel }}</span>
+            <sc-if value="{{ a.submitted }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:oklch(45% 0.02 265)">
+                <span>{{ a.fileName }}</span>
+                <a onClick="{{ a.remove }}" style="cursor:pointer;color:oklch(58% 0.20 25);text-decoration:none;font-weight:600">Entfernen</a>
+              </div>
+            </sc-if>
+            <sc-if value="{{ a.notSubmitted }}" hint-placeholder-val="{{ true }}">
+              <label style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:10px;background:oklch(58% 0.19 290);color:#fff;font-family:'Space Grotesk';font-weight:600;font-size:13px">
+                Datei hochladen
+                <input type="file" onChange="{{ a.upload }}">
+              </label>
+            </sc-if>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isNachrichten }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Postfach" style="display:flex;flex-direction:column;gap:10px">
+      <sc-for list="{{ inboxFull }}" as="m" hint-placeholder-count="4">
+        <div onClick="{{ m.onClick }}" style="{{ m.rowFullStyle }}">
+          <div style="display:flex;justify-content:space-between;gap:12px">
+            <span style="font-size:14px;font-weight:{{ m.weight }}">{{ m.from }}</span>
+            <span style="font-size:12px;color:oklch(55% 0.02 265)">{{ m.date }}</span>
+          </div>
+          <div style="font-size:14px;font-weight:{{ m.weight }};margin-top:2px">{{ m.subject }}</div>
+          <div style="font-size:13px;color:oklch(45% 0.02 265);margin-top:4px">{{ m.preview }}</div>
+        </div>
+      </sc-for>
+    </div>
+    </sc-if>
+
+    </div>
+  </div>
+</div>
+</sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;defaultPersona&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;mim&quot;,&quot;options&quot;:[&quot;mim&quot;,&quot;bwl&quot;,&quot;gs&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Demo&quot;}}">
+class Component extends DCLogic {
+  personas = [
+    {
+      id: 'mim', name: 'Lina Cortez', studiengang: 'Medien- und IT-Management', semester: 3, matrikel: 'MIM-24118',
+      heute: [
+        { time: '09:00–10:30', course: 'Mediendesign Grundlagen', room: 'M.204', dozent: 'Prof. Berger' },
+        { time: '11:00–12:30', course: 'Datenbanksysteme', room: 'IT.110', dozent: 'Prof. Nkemelu' },
+        { time: '14:00–15:30', course: 'Medienrecht', room: 'M.107', dozent: 'Prof. Adler' }
+      ],
+      abgaben: [
+        { id: 'mim-a1', title: 'Projektbericht "UX Case Study"', modul: 'Mediendesign', due: '18.09.2026' },
+        { id: 'mim-a2', title: 'Konzeptpapier Social-Media-Kampagne', modul: 'Digitales Marketing', due: '22.09.2026' },
+        { id: 'mim-a3', title: 'Datenbank-Entwurf (ER-Modell)', modul: 'Datenbanksysteme', due: '29.09.2026' }
+      ],
+      klausuren: [
+        { modul: 'Medienrecht', date: '30.09.2026', time: '09:00', room: 'M.107' },
+        { modul: 'Datenbanksysteme', date: '07.10.2026', time: '11:00', room: 'IT.110' }
+      ],
+      noten: [
+        { modul: 'Mediengestaltung I', note: 1.7, ects: 5 },
+        { modul: 'BWL Grundlagen', note: 2.3, ects: 5 },
+        { modul: 'Statistik', note: 3.0, ects: 5 },
+        { modul: 'Medienrecht', note: null, ects: 5 },
+        { modul: 'Datenbanksysteme', note: null, ects: 5 }
+      ],
+      nachrichten: [
+        { id: 'mim-1', from: 'Prof. Berger', subject: 'Feedback zu eurem Moodboard', date: '12.09.', read: false, preview: 'Ich habe die Moodboards durchgesehen — insgesamt guter Stand, zwei Anmerkungen zur Typografie im Anhang.' },
+        { id: 'mim-2', from: 'Studierendensekretariat', subject: 'Rückmeldung Wintersemester erforderlich', date: '10.09.', read: false, preview: 'Bitte melden Sie sich bis zum 30.09. für das Wintersemester 2026/27 zurück.' },
+        { id: 'mim-3', from: 'IT-Support', subject: 'Wartungsarbeiten im WLAN am 16.09.', date: '09.09.', read: true, preview: 'Von 06:00 bis 08:00 Uhr steht das Campus-WLAN für Wartungsarbeiten nicht zur Verfügung.' }
+      ],
+      stundenplan: [
+        { day: 'Montag', items: [
+          { time: '09:00–10:30', course: 'Mediendesign Grundlagen', room: 'M.204' },
+          { time: '11:00–12:30', course: 'Datenbanksysteme', room: 'IT.110' },
+          { time: '14:00–15:30', course: 'Medienrecht', room: 'M.107' }
+        ]},
+        { day: 'Dienstag', items: [
+          { time: '10:00–11:30', course: 'Digitales Marketing', room: 'M.112' }
+        ]},
+        { day: 'Mittwoch', items: [
+          { time: '09:00–10:30', course: 'Statistik', room: 'B.205' },
+          { time: '13:00–14:30', course: 'Mediendesign Grundlagen (Übung)', room: 'M.204' }
+        ]},
+        { day: 'Donnerstag', items: [
+          { time: '11:00–12:30', course: 'Datenbanksysteme (Übung)', room: 'IT.110' }
+        ]},
+        { day: 'Freitag', items: [
+          { time: '09:00–10:30', course: 'Medienrecht', room: 'M.107' },
+          { time: '11:00–12:30', course: 'Projektwerkstatt', room: 'M.118' }
+        ]}
+      ]
+    },
+    {
+      id: 'bwl', name: 'Jonas Weber', studiengang: 'Betriebswirtschaftslehre', semester: 5, matrikel: 'BWL-22056',
+      heute: [
+        { time: '08:30–10:00', course: 'Controlling', room: 'B.301', dozent: 'Prof. Reinke' },
+        { time: '10:15–11:45', course: 'Unternehmensrecht', room: 'B.212', dozent: 'Prof. Falke' },
+        { time: '13:00–14:30', course: 'Seminar Personalmanagement', room: 'B.108', dozent: 'Prof. Holt' }
+      ],
+      abgaben: [
+        { id: 'bwl-a1', title: 'Fallstudie Controlling', modul: 'Controlling', due: '17.09.2026' },
+        { id: 'bwl-a2', title: 'Hausarbeit Personalmanagement', modul: 'Personalmanagement', due: '25.09.2026' },
+        { id: 'bwl-a3', title: 'Gruppenpräsentation', modul: 'Unternehmensrecht', due: '01.10.2026' }
+      ],
+      klausuren: [
+        { modul: 'Controlling', date: '28.09.2026', time: '10:00', room: 'B.301' },
+        { modul: 'Investition & Finanzierung', date: '05.10.2026', time: '09:00', room: 'B.114' }
+      ],
+      noten: [
+        { modul: 'Marketing', note: 2.0, ects: 5 },
+        { modul: 'Kostenrechnung', note: 2.7, ects: 5 },
+        { modul: 'Wirtschaftsenglisch', note: 1.3, ects: 5 },
+        { modul: 'Controlling', note: null, ects: 5 },
+        { modul: 'Investition & Finanzierung', note: null, ects: 5 }
+      ],
+      nachrichten: [
+        { id: 'bwl-1', from: 'Prof. Reinke', subject: 'Fallstudie: zusätzliche Daten', date: '13.09.', read: false, preview: 'Im Anhang findet ihr die ergänzenden Kennzahlen für die Fallstudie Controlling.' },
+        { id: 'bwl-2', from: 'Prüfungsamt', subject: 'Klausurplan Wintersemester veröffentlicht', date: '11.09.', read: false, preview: 'Der Klausurplan für das Wintersemester 2026/27 ist ab sofort im Portal einsehbar.' },
+        { id: 'bwl-3', from: 'AStA', subject: 'Einladung Erstsemesterfahrt', date: '08.09.', read: true, preview: 'Auch höhere Semester sind herzlich eingeladen, die Erstsemesterfahrt mitzugestalten.' }
+      ],
+      stundenplan: [
+        { day: 'Montag', items: [
+          { time: '08:30–10:00', course: 'Controlling', room: 'B.301' },
+          { time: '10:15–11:45', course: 'Unternehmensrecht', room: 'B.212' },
+          { time: '13:00–14:30', course: 'Seminar Personalmanagement', room: 'B.108' }
+        ]},
+        { day: 'Dienstag', items: [
+          { time: '09:00–10:30', course: 'Investition & Finanzierung', room: 'B.114' }
+        ]},
+        { day: 'Mittwoch', items: [
+          { time: '11:00–12:30', course: 'Marketing', room: 'B.220' },
+          { time: '14:00–15:30', course: 'Kostenrechnung', room: 'B.115' }
+        ]},
+        { day: 'Donnerstag', items: [
+          { time: '08:30–10:00', course: 'Controlling (Übung)', room: 'B.301' }
+        ]},
+        { day: 'Freitag', items: [
+          { time: '10:00–11:30', course: 'Wirtschaftsenglisch', room: 'B.109' }
+        ]}
+      ]
+    },
+    {
+      id: 'gs', name: 'Amelie Hoffmann', studiengang: 'Gesundheit und Soziales', semester: 2, matrikel: 'GS-25091',
+      heute: [
+        { time: '09:00–10:30', course: 'Grundlagen der Pflegewissenschaft', room: 'G.101', dozent: 'Prof. Sander' },
+        { time: '10:45–12:15', course: 'Sozialrecht', room: 'G.204', dozent: 'Prof. Wille' },
+        { time: '13:30–15:00', course: 'Kommunikation im Gesundheitswesen', room: 'G.108', dozent: 'Prof. Lenz' }
+      ],
+      abgaben: [
+        { id: 'gs-a1', title: 'Reflexionsbericht Praxisphase', modul: 'Pflegewissenschaft', due: '19.09.2026' },
+        { id: 'gs-a2', title: 'Essay', modul: 'Sozialrecht', due: '23.09.2026' },
+        { id: 'gs-a3', title: 'Gruppenarbeit Kommunikationsmodelle', modul: 'Kommunikation im Gesundheitswesen', due: '30.09.2026' }
+      ],
+      klausuren: [
+        { modul: 'Sozialrecht', date: '01.10.2026', time: '09:00', room: 'G.204' },
+        { modul: 'Pflegewissenschaft', date: '08.10.2026', time: '11:00', room: 'G.101' }
+      ],
+      noten: [
+        { modul: 'Anatomie & Physiologie', note: 1.7, ects: 5 },
+        { modul: 'Ethik im Gesundheitswesen', note: 2.0, ects: 5 },
+        { modul: 'Sozialrecht', note: null, ects: 5 },
+        { modul: 'Pflegewissenschaft', note: null, ects: 5 }
+      ],
+      nachrichten: [
+        { id: 'gs-1', from: 'Prof. Sander', subject: 'Praxisphase: Unterlagen einreichen', date: '12.09.', read: false, preview: 'Bitte reicht den Praxisphasen-Nachweis bis zum 20.09. im Sekretariat ein.' },
+        { id: 'gs-2', from: 'Praktikumsbüro', subject: 'Praktikumsplätze Frühjahr 2027', date: '10.09.', read: false, preview: 'Neue Praktikumsplätze in Kliniken und sozialen Einrichtungen sind online.' },
+        { id: 'gs-3', from: 'Studierendensekretariat', subject: 'Rückmeldung Wintersemester erforderlich', date: '10.09.', read: true, preview: 'Bitte melden Sie sich bis zum 30.09. für das Wintersemester 2026/27 zurück.' }
+      ],
+      stundenplan: [
+        { day: 'Montag', items: [
+          { time: '09:00–10:30', course: 'Grundlagen der Pflegewissenschaft', room: 'G.101' },
+          { time: '10:45–12:15', course: 'Sozialrecht', room: 'G.204' },
+          { time: '13:30–15:00', course: 'Kommunikation im Gesundheitswesen', room: 'G.108' }
+        ]},
+        { day: 'Dienstag', items: [
+          { time: '09:00–10:30', course: 'Anatomie & Physiologie', room: 'G.115' }
+        ]},
+        { day: 'Mittwoch', items: [
+          { time: '11:00–12:30', course: 'Ethik im Gesundheitswesen', room: 'G.109' }
+        ]},
+        { day: 'Donnerstag', items: [
+          { time: '09:00–10:30', course: 'Sozialrecht (Übung)', room: 'G.204' },
+          { time: '13:00–14:30', course: 'Praxisreflexion', room: 'G.108' }
+        ]},
+        { day: 'Freitag', items: [
+          { time: '10:00–11:30', course: 'Pflegewissenschaft (Übung)', room: 'G.101' }
+        ]}
+      ]
+    }
+  ];
+
+  news = [
+    { source: 'Prüfungsamt', text: 'Rückmeldefrist Wintersemester 2026/27 endet am 30.09.' },
+    { source: 'Bibliothek', text: 'Neue Öffnungszeiten ab 1. Oktober — täglich bis 22 Uhr.' },
+    { source: 'Career Center', text: 'Career Day am 14. Oktober im Audimax.' }
+  ];
+
+  state = { screen: 'login', personaId: 'mim', password: '', readOverrides: {}, submissions: {} };
+
+  componentDidMount() {
+    if (this.props.defaultPersona) this.setState({ personaId: this.props.defaultPersona });
+  }
+
+  selectPersona = (e) => this.setState({ personaId: e.target.value });
+  setPassword = (e) => this.setState({ password: e.target.value });
+  login = (e) => { e.preventDefault(); this.setState({ screen: 'dashboard' }); };
+  logout = () => this.setState({ screen: 'login', password: '' });
+  goTo = (screen) => () => this.setState({ screen });
+  markRead = (id) => () => this.setState((s) => ({ readOverrides: { ...s.readOverrides, [id]: true } }));
+  uploadFile = (id) => (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    this.setState((s) => ({ submissions: { ...s.submissions, [id]: { fileName: file.name } } }));
+  };
+  removeFile = (id) => () => this.setState((s) => {
+    const next = { ...s.submissions };
+    delete next[id];
+    return { submissions: next };
+  });
+
+  renderVals() {
+    const persona = this.personas.find((p) => p.id === this.state.personaId);
+    const screen = this.state.screen;
+    const isRead = (m) => m.read || this.state.readOverrides[m.id];
+    const unreadCount = persona.nachrichten.filter((m) => !isRead(m)).length;
+
+    const personasForLogin = this.personas.map((p) => {
+      const selected = p.id === this.state.personaId;
+      return {
+        ...p, selected,
+        optionStyle: `display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;border:1.5px solid ${selected ? 'oklch(58% 0.19 290)' : 'oklch(90% 0.01 265)'};cursor:pointer;background:${selected ? 'oklch(95% 0.03 290)' : 'transparent'}`,
+        dotStyle: `width:16px;height:16px;flex:none;border-radius:50%;border:1.5px solid ${selected ? 'oklch(58% 0.19 290)' : 'oklch(80% 0.01 265)'};background:${selected ? 'oklch(58% 0.19 290)' : 'transparent'};box-shadow:${selected ? 'inset 0 0 0 3px #fff' : 'none'}`
+      };
+    });
+
+    const buildInboxRow = (m, full) => ({
+      ...m,
+      weight: isRead(m) ? 400 : 700,
+      onClick: full ? this.markRead(m.id) : undefined,
+      rowFullStyle: `padding:16px 18px;border-radius:14px;cursor:pointer;background:${isRead(m) ? '#fff' : 'oklch(95% 0.03 290)'};box-shadow:0 4px 16px oklch(30% 0.05 290 / 0.06)`
+    });
+
+    const noteLabel = (n) => (n.note == null ? '—' : n.note.toFixed(1).replace('.', ','));
+    const numericNotes = persona.noten.filter((n) => n.note != null).map((n) => n.note);
+    const avg = numericNotes.length ? (numericNotes.reduce((a, b) => a + b, 0) / numericNotes.length) : null;
+
+    const navColor = (s) => `display:flex;align-items:center;gap:10px;cursor:pointer;text-decoration:none;font-family:'Space Grotesk';font-weight:600;font-size:14px;padding:10px 12px;border-radius:10px;color:${screen === s ? '#fff' : 'rgba(255,255,255,0.65)'};background:${screen === s ? 'rgba(255,255,255,0.14)' : 'transparent'}`;
+
+    const submissions = this.state.submissions;
+    const abgabenList = persona.abgaben.map((a) => {
+      const sub = submissions[a.id];
+      return {
+        ...a,
+        submitted: !!sub,
+        notSubmitted: !sub,
+        fileName: sub ? sub.fileName : '',
+        upload: this.uploadFile(a.id),
+        remove: this.removeFile(a.id),
+        tagLabel: sub ? 'Eingereicht' : 'Offen',
+        tagStyle: `font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;background:${sub ? 'oklch(94% 0.04 175)' : 'oklch(96% 0.03 70)'};color:${sub ? 'oklch(38% 0.12 175)' : 'oklch(45% 0.13 55)'}`
+      };
+    });
+    const openCount = abgabenList.filter((a) => !a.submitted).length;
+
+    const pageTitles = { dashboard: 'Guten Tag, ' + persona.name.split(' ')[0], stundenplan: 'Stundenplan', noten: 'Notenübersicht', abgaben: 'Abgaben', nachrichten: 'Postfach' };
+
+    return {
+      isLogin: screen === 'login',
+      isApp: screen !== 'login',
+      isDashboard: screen === 'dashboard',
+      isStundenplan: screen === 'stundenplan',
+      isNoten: screen === 'noten',
+      isAbgaben: screen === 'abgaben',
+      isNachrichten: screen === 'nachrichten',
+      persona, news: this.news,
+      personasForLogin,
+      password: this.state.password, setPassword: this.setPassword,
+      selectPersona: this.selectPersona, login: this.login, logout: this.logout,
+      goDashboard: this.goTo('dashboard'), goStundenplan: this.goTo('stundenplan'),
+      goNoten: this.goTo('noten'), goAbgaben: this.goTo('abgaben'), goNachrichten: this.goTo('nachrichten'),
+      navStyles: { dashboard: navColor('dashboard'), stundenplan: navColor('stundenplan'), noten: navColor('noten'), abgaben: navColor('abgaben'), nachrichten: navColor('nachrichten') },
+      navDotStyle: 'width:6px;height:6px;border-radius:50%;background:currentColor;flex:none',
+      pageTitle: pageTitles[screen] || '',
+      unreadCount, hasUnread: unreadCount > 0,
+      initials: persona.name.split(' ').map((n) => n[0]).join(''),
+      inboxPreview: persona.nachrichten.slice(0, 3).map((m) => buildInboxRow(m, false)),
+      inboxFull: persona.nachrichten.map((m) => buildInboxRow(m, true)),
+      avgGrade: avg == null ? '—' : avg.toFixed(1).replace('.', ','),
+      nextExamDate: persona.klausuren[0] ? persona.klausuren[0].date : '—',
+      openCount, abgabenList,
+      noten: persona.noten.map((g) => ({
+        ...g,
+        noteLabel: noteLabel(g),
+        statusLabel: g.note == null ? 'offen' : 'bestanden',
+        tagStyle: `display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;background:${g.note == null ? 'oklch(96% 0.005 265)' : 'oklch(94% 0.04 175)'};color:${g.note == null ? 'oklch(50% 0.02 265)' : 'oklch(38% 0.12 175)'}`
+      }))
+    };
+  }
+}
+
+</script>
+</body>
+</html>
